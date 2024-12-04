@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body{
+            /* background-color: aqua; */
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/style.css">
+    <title>Home</title>
+</head>
+<body>
+    <h1>URL shortner Service</h1>
+    <% if (locals.id) { %>
+     <p>http://localhost:4001/url/<%= id %></p>
+    <% } %>
+    <div>
+        <form action="/url" method="POST">
+            <label for="">Enter Your Original URL</label>
+            <input type="text" name="url" placeholder="https://example.com">
+            <button type="submit">Generate</button>
+        </form>
+    </div>
+</body>
+</html>

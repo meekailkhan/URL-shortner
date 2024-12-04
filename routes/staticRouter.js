@@ -1,5 +1,4 @@
 import express from 'express';
-import controll from '../controller/url.js'
 import path from 'path'
 import { fileURLToPath } from 'url';
 
@@ -12,11 +11,8 @@ const __dirname = path.dirname(__filename)
 const publicDir = path.join(__dirname,'../public')
 router.use(express.static(publicDir))
 
-
-router.post('/',controll.shortUrl)
-
-router.get('/:shortID',controll.redirectHandler);
-
-router.get('/analystic/:shortID',controll.analysticHandler)
+router.get('/', (req,res)=>{
+    return res.render('home')
+})
 
 export default router
