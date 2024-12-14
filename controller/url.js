@@ -8,11 +8,12 @@ async function shortUrl(req, res) {
     if (!body.url) return res.status(400).json({ error: "URL is required" });
 
     const shortID = nanoid(8);
-
+    console.log(req.body.user._id)
     await db.URL.create({
         shortId: shortID,
         redirectURL: body.url,
-        visitHistory: []
+        visitHistory: [],
+        createdBy : req.body.user._id
 
     })
 
