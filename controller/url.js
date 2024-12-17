@@ -8,12 +8,12 @@ async function shortUrl(req, res) {
     if (!body.url) return res.status(400).json({ error: "URL is required" });
 
     const shortID = nanoid(8);
-    console.log(req.body.user._id)
+    console.log(req.user._id)
     await db.URL.create({
         shortId: shortID,
         redirectURL: body.url,
         visitHistory: [],
-        createdBy : req.body.user._id
+        createdBy : req.    user._id
 
     })
 
@@ -23,22 +23,51 @@ async function shortUrl(req, res) {
 }
 
 
+// async function redirectHandler(req, res) {
+//     const shortId = req.params.shortID;
+
+//     const entry = await db.URL.findOneAndUpdate(
+//         {
+//             shortId
+//         },
+//         {
+//             $push: {
+//                 visitHistory: {
+//                     timestamp: Date.now()
+//                 }
+//             }
+//         })
+//     console.log(entry)
+//     res.redirect(entry.redirectURL)
+// }
 async function redirectHandler(req, res) {
     const shortId = req.params.shortID;
 
-    const entry = await db.URL.findOneAndUpdate(
-        {
-            shortId
-        },
-        {
-            $push: {
-                visitHistory: {
-                    timestamp: Date.now()
+    try {
+        const entry = await db.URL.findOneAndUpdate(
+            { shortId },
+            {
+                $push: {
+                    visitHistory: {
+                        timestamp: Date.now()
+                    }
                 }
             }
-        })
-    res.redirect(entry.redirectURL)
+        );
+
+        // Check if entry exists
+        if (!entry) {
+            return res.status(404).send('Short URL not found');
+        }
+
+        // Redirect to the original URL
+        res.redirect(entry.redirectURL);
+    } catch (error) {
+        console.error('Error in redirect:', error);
+        res.status(500).send('Server error');
+    }
 }
+
 
 async function analysticHandler(req, res) {
     const shortId = req.params.shortID;

@@ -25,13 +25,11 @@ async function userLoginHandle(req,res){
             error : "Invalid Email or Password"
         })
     }
-    const sessionId = uuidv4();
-    serviceAuth.setUser(sessionId,user);
-    console.log('Session Set:', sessionId, user);
-    res.cookie('uid', sessionId);
     
-
-    return res.redirect('/')
+    const token = serviceAuth.setUser(user);
+    res.cookie('token', token);
+    
+    return res.redirect("/")
 }
 
 export default {

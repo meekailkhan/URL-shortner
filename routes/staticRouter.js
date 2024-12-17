@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path'
+import middleware from '../middlewares/auth.js'
 import db from '../modles/url.js'
 import { fileURLToPath } from 'url';
 
@@ -14,9 +15,15 @@ router.use(express.static(publicDir))
 
 // router.set('view engine', 'ejs');
 
-router.get('/', async (req,res)=>{
-    if(!req.body.user) return res.redirect('/login')
-    const allUrls = await db.URL.find({createdBy : req.body.user._id}); 
+router.get('/', middleware.restrictTo(["NORMAL","ADMIN"]), async (req,res)=>{
+    const allUrls = await db.URL.find({createdBy : req.user._id}); 
+    return res.render('home',{
+        urls : allUrls
+    })
+})
+
+router.get("/admin/urls",middleware.restrictTo(["ADMIN"]),async (req,res)=>{
+    const allUrls = await db.URL.find(); 
     return res.render('home',{
         urls : allUrls
     })

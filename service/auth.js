@@ -1,11 +1,27 @@
-const sessionIdToUserMap = new Map();
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-function setUser(id,user){
-    sessionIdToUserMap.set(id,user);
+const secreteKey = '$#1Loger'
+
+
+dotenv.config();
+
+function setUser(user){
+    console.log("Payload for JWT:", user);
+    return jwt.sign({
+        _id : user._id,
+        email : user.email,
+        password : user.password,
+        role : user.role
+    },secreteKey)
 }
 
-function getUser(id){
-    return sessionIdToUserMap.get(id)
+function getUser(token){
+    try{
+        return jwt.verify(token,secreteKey)
+    }catch(err){
+        return null
+    }
 }
 
 export default {

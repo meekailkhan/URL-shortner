@@ -1,28 +1,40 @@
+import jwt from 'jsonwebtoken';
 import serviceAuth from '../service/auth.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const SECRET_KEY = process.env.SECRETE || "$#1Loger";
 
 
-async function restrictToLoggedInUserOnly(req,res,next){
-    const userUid = req.cookies?.uid;
-    if(!userUid) return res.redirect('/login');
-    const user = serviceAuth.getUser(userUid);
-    console.log(user)
-    console.log(userUid)
+function checkForAuthentication(req,res,next) {
+    const tokenCookie = req.cookies?.token;
+    req.user = null;
 
-    if(!user) return res.redirect('/login');
-    req.body.user = user;
-    next();
-}   
+    if(!tokenCookie){
+        return next();
+    }
 
-async function checkAuth(req,res,next){
-    const userUid = req.cookies?.uid;
+    const token = tokenCookie;
+    const user = serviceAuth.getUser(token);
 
-    const user = serviceAuth.getUser(userUid);
-    
-    req.body.user = user;
-    next();
+    req.user = user;
+    return next()
 }
 
+function restrictTo(roles){
+    return function(req,res,next){
+        if(!req.user) return res.redirect('/login');
+
+        if(!roles.includes(req.user.role)) return res.end("you're unauthorized");
+
+        next()
+    }
+}
+
+
+
 export default {
-    restrictToLoggedInUserOnly,
-    checkAuth
+    checkForAuthentication,
+    restrictTo
 }
